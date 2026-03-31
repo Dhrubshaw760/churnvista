@@ -11,7 +11,7 @@ joblib
 numpy
 matplotlib
 pytorch-tabnet
---index-url https://download.pytorch.org/whl/cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch
 torchvision
 torchaudio

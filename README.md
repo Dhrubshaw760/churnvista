@@ -1,4 +1,5 @@
 ---
+python_version: 3.10
 title: Churn Predictor
 emoji: 📊
 colorFrom: indigo

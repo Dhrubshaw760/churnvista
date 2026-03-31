@@ -20,20 +20,31 @@ import os
 from io import BytesIO
 
 # ----------------------------- LOAD DATA -----------------------------
-df = pd.read_csv("churn.csv")
-df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
-df = df.dropna()
-df["Churn"] = df["Churn"].map({"Yes": 1, "No": 0})
+# ----------------------------- LOAD DATA -----------------------------
+def load_and_preprocess():
+    # Try to find the file regardless of the name
+    data_file = "churn.csv" if os.path.exists("churn.csv") else "WA_Fn-UseC_-Telco-Customer-Churn.csv"
+    
+    if not os.path.exists(data_file):
+        return None, None, None, None, None
 
-# Preprocess
-X = df.drop(["customerID", "Churn"], axis=1)
-y = df["Churn"]
-X = pd.get_dummies(X, drop_first=True)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+    df = pd.read_csv(data_file)
+    df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
+    df = df.dropna()
+    df["Churn"] = df["Churn"].map({"Yes": 1, "No": 0})
 
-models_dict = {}
-best_model_name = None
-best_model = None
+    # Preprocess
+    X = df.drop(["customerID", "Churn"], axis=1)
+    y = df["Churn"]
+    X = pd.get_dummies(X, drop_first=True)
+    return train_test_split(X, y, test_size=0.2, random_state=42, stratify=y), X, df
+
+# Call it safely
+split_data, X, df_original = load_and_preprocess()
+if split_data:
+    X_train, X_test, y_train, y_test = split_data
+else:
+    print("Error: Dataset not found!")
 
 # ----------------------------- HELPER FUNCTIONS -----------------------------
 def train_single_model(model_name, n_trials=20):
@@ -118,8 +129,8 @@ def create_eda():
 def run_arena():
     global best_model_name, best_model
     results = {}
-    for name in ["Logistic Regression", "Random Forest", "XGBoost", "LightGBM", "CatBoost", "Neural Net", "TabNet", "Tiny Transformer"]:
-        auc = train_single_model(name, n_trials=15)
+    for name in ["Logistic Regression", "Random Forest", "XGBoost"]:
+        auc = train_single_model(name, n_trials=3)
         results[name] = round(auc, 4)
     best_model_name = max(results, key=results.get)
     best_model = models_dict[best_model_name]

@@ -15,6 +15,6 @@ jobs:
           lfs: true
       - name: Push to hub
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          git remote add hf https://KasINObaby:$HF_TOKEN@huggingface.co/spaces/KasINObaby/churn-predictor
         run: |
-          git push --force https://KasINObaby:$HF_TOKEN@huggingface.co/spaces/KasINObaby/churn-predictor main
+          git push --force hf main
